@@ -11,7 +11,31 @@ function App() {
 
   // 1. Upload images to appwrite
   const uploadImage = async (e) => {
-    
+    e.preventDefault();
+
+    try {
+      // Checks if user is logged in current session
+      const user = await account.getSession("current");
+
+      for (let i = 0; i < image.length; i++) {
+
+        if (user) {
+          // Upload image
+          await storage.createFile(image[i], ["*"], ["*"]);
+          console.log('Image uploaded successfully!');
+          window.location.reload(); // Reloads window on upload
+        } else {
+          // Create anonymous user
+          await account.createAnonymousSession();
+          await storage.createFile(image[i], ["*"], ["*"]);
+          console.log('New user was created ');
+          window.location.reload();
+        }
+      }
+
+    } catch (error) {
+      console.log(`${error.message}`);
+    }
   };
 
   // 2. Delete an image
